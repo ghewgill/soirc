@@ -7,7 +7,9 @@ In the spirit of "the simplest thing that can possibly work", there are currentl
 
 - the only connected channel is "Chat Feedback" (77)
 - everything you say is echoed back to you
-- encoded entities like &quot; are not decoded
+- encoded entities like `&quot;` are not decoded
+- HTML leaks through to IRC
+- an action in IRC shows up as "ACTION blah blah" on SO
 - everything is undoubtedly fragile
 
 You must copy `soirc.config.sample` to `soirc.config` and insert your `somusr` cookie value from your browser.
