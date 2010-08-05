@@ -87,26 +87,6 @@ class IrcClient(object):
         for f in friends:
             self.sock.send(":soirc 352 %s #soirc %s soirc soirc %s H :1 %s\r\n" % (self.nick, f['screen_name'], f['screen_name'], f['name']))
         self.sock.send(":soirc 315 %s :End of /WHO list" % self.nick)
-    def handle_whois(self, params):
-        userinfo = load_json("http://twitter.com/users/show/%s.json" % params)
-        if 'error' in userinfo:
-            return "User %s %s.\r\n" % (params, userinfo['error'])
-        else:
-            self.sock.send("%s [%s]\r\n" % (userinfo['screen_name'], userinfo['id']))
-            for key, descr in (("name", "Real Name"),
-                               ("verified", "Verified"),
-                               ("location", "Location"),
-                               ("time_zone", "Time Zone"),
-                               ("description", "Description"),
-                               ("url", "Home Page"),
-                               ("followers_count", "Followers"),
-                               ("friends_count", "Following"),
-                               ("favourites_count", "Favourites")):
-                if key in userinfo:
-                    self.sock.send(" %-12s : %s\r\n" % (descr, userinfo[key]))
-            if 'status' in userinfo and 'created_at' in userinfo['status']:
-                self.sock.send(" %-12s : %s\r\n" % ("Idle Since",userinfo['status']['created_at']))
-        return "End of WHOIS"
     def ident(self):
         return "%s!%s@%s" % (self.nick, self.user, "soirc")
     def privmsg(self, user, channel, msg):
