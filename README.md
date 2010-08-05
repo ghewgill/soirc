@@ -10,6 +10,7 @@ In the spirit of "the simplest thing that can possibly work", there are currentl
 - encoded entities like `&quot;` are not decoded
 - HTML leaks through to IRC
 - an action in IRC shows up as "ACTION blah blah" on SO
+- HTTP errors cause an exception and exit
 - everything is undoubtedly fragile
 
 You must copy `soirc.config.sample` to `soirc.config` and insert your `somusr` cookie value from your browser.
