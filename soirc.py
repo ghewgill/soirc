@@ -134,7 +134,11 @@ class ChatServer(object):
         if now - self.lasttick < 2:
             return
         self.lasttick = now
-        jsdata = opener.open("http://chat.meta.stackoverflow.com/chats/%d/events?since=%d" % (self.room, self.lasttime), urllib.urlencode({'fkey': self.fkey})).read()
+        try:
+            jsdata = opener.open("http://chat.meta.stackoverflow.com/chats/%d/events" % (self.room), urllib.urlencode({'fkey': self.fkey, 'since': self.lasttime, 'mode': "Messages"})).read()
+        except Exception as x:
+            print x
+            return
         try:
             data = json.loads(jsdata)
         except Exception as x:
@@ -142,11 +146,13 @@ class ChatServer(object):
             print jsdata
             self.lasttime = 0
             return
-        if data['events']:
-            print data['time'], len(data['events'])
+        print data['time'], len(data['events'])
         for e in data['events']:
-            if e['event_type'] in (1, 2):
-                self.sender(e['user_name'].replace(" ", ""), e['content'])
+            if 'id' in e and e['id'] > self.lasttime:
+                print e
+                if e['room_id'] == self.room:
+                    if e['event_type'] in (1, 2) and 'content' in e:
+                        self.sender(e['user_name'].replace(" ", ""), e['content'])
         self.lasttime = data['time']
 
 cj = cookielib.CookieJar()
@@ -155,7 +161,7 @@ opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
 
 server = IrcServer(lambda user, channel, msg: sources[0].post(msg))
 sources = []
-for room in (77,):
+for room in (204,):
     sources.append(ChatServer(room, lambda user, msg: server.privmsg("%s!%s@%s" % (user.encode("UTF-8"), user.encode("UTF-8"), "soirc"), "#soirc", msg.encode("UTF-8"))))
 
 while True:
